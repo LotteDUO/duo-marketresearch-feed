@@ -1,802 +1,1411 @@
 <!DOCTYPE html>
 <html lang="nl">
-  <head>
-    <meta charset="UTF-8" />
-    <title>DUO Market Research Nieuws</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Market Research Nieuws | DUO-Onderwijs</title>
+  <style>
+    /* --------------------------- Design tokens --------------------------- */
+    :root {
+      --page: #f3f8fb;
+      --surface: #fff;
+      --ink: #173042;
+      --muted: #5f7482;
+      --border: #d6e4eb;
+      --olive: #003b5c;
+      --lime: #8cc63f;
+      --soft-green: #e8f6fb;
+      --warning-bg: #fff4dd;
+      --warning-ink: #79500d;
+      --error-bg: #fff0ef;
+      --error-ink: #ad3030;
+      --shadow: 0 5px 20px rgba(0, 59, 92, .08);
+      --radius: 16px;
+    }
 
-    <style>
-      :root {
-        --duo-navy: #003b5c;
-        --duo-cyan: #00a6ce;
-        --duo-green: #8cc63f;
-        --duo-sky: #e8f6fb;
-        --duo-bg: #f3f8fb;
-        --duo-text: #173042;
-        --duo-muted: #5f7482;
-        --duo-white: #ffffff;
-      }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid #00a6ce; outline-offset: 3px; }
+    [hidden] { display: none !important; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    .icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+    .icon svg { display: block; width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+    .page { width: min(100% - 36px, 1280px); margin: 0 auto; padding: 22px 0 52px; }
 
-      body {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: var(--duo-bg);
-        color: var(--duo-text);
-        padding: 20px;
-      }
+    /* ------------------------------ Header ------------------------------- */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--olive), #005b7f);
+      color: white;
+      padding: 20px 28px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      box-shadow: 0 10px 28px rgba(0, 59, 92, .16);
+    }
+    .hero::before {
+      content: ""; position: absolute; z-index: -1;
+      width: 138px; height: 138px; top: -84px; right: 130px;
+      background: var(--lime); border-radius: 50%;
+    }
+    .hero::after {
+      content: ""; position: absolute; z-index: -1;
+      width: 98px; height: 98px; right: -47px; bottom: -49px;
+      background: #00a6ce; transform: rotate(45deg);
+    }
+    .eyebrow { font-size: 11px; font-weight: 750; letter-spacing: .13em; color: #d9f2f8; text-transform: uppercase; }
+    .hero h1 { font-size: clamp(28px, 3vw, 39px); letter-spacing: -.035em; line-height: 1.14; color: #ffffff; margin: 4px 0 3px; }
+    .hero p { margin: 0; font-size: 14px; color: #d9f2f8; }
+    .hero-side { flex-shrink: 0; text-align: right; align-self: end; max-width: 330px; }
+    .hero-side span { display: block; color: #d9f2f8; font-size: 12px; }
+    .hero-side .last-check { font-weight: 700; color: white; }
 
-      .page {
-        max-width: 1300px;
-        margin: 0 auto;
-      }
+    /* ------------------------------ Controls ----------------------------- */
+    .control-surface {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      margin-top: 17px; padding: 17px 19px 15px;
+    }
+    .control-top, .filter-row, .view-switch, .section-bar, .tab-row, .controls-right { display: flex; align-items: center; }
+    .control-top { gap: 12px; justify-content: space-between; }
+    .search-box { position: relative; min-width: 220px; max-width: 490px; flex: 1; }
+    .search-box > .icon { position: absolute; top: 50%; left: 13px; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    .search-box input {
+      display: block; width: 100%; height: 43px; border: 1px solid var(--border);
+      border-radius: 11px; background: #ffffff; color: var(--ink);
+      outline: none; padding: 0 42px 0 42px; font-size: 14px;
+    }
+    .search-box input:focus { border-color: #00a6ce; box-shadow: 0 0 0 3px rgba(0, 166, 206, .18); }
+    .clear-search {
+      position: absolute; right: 5px; top: 5px; width: 32px; height: 33px;
+      border: 0; border-radius: 9px; background: transparent; color: var(--muted); font-size: 23px; line-height: 1;
+    }
+    .clear-search:hover { background: var(--soft-green); color: var(--ink); }
+    .controls-right { gap: 9px; }
+    .view-switch { padding: 3px; background: #e8f6fb; border-radius: 11px; gap: 3px; }
+    .view-btn {
+      border: 0; border-radius: 8px; background: transparent; color: var(--muted);
+      padding: 8px 11px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;
+      font-weight: 650;
+    }
+    .view-btn[aria-pressed="true"] { background: white; color: var(--olive); box-shadow: 0 1px 5px rgba(0,0,0,.08); }
+    .view-btn:hover { color: var(--ink); }
+    .filter-row { border-top: 1px solid #dbeaf0; margin-top: 14px; padding-top: 14px; gap: 12px; justify-content: space-between; align-items: flex-start; }
+    .preset-wrap { display: flex; flex: 1; flex-wrap: wrap; gap: 7px; align-items: center; }
+    .preset-btn, .secondary-btn {
+      border: 1px solid var(--border); border-radius: 999px; background: white;
+      color: var(--ink); padding: 7px 12px; font-size: 12.5px; line-height: 1.3; font-weight: 650;
+    }
+    .preset-btn:hover, .secondary-btn:hover { border-color: #00a6ce; background: #e8f6fb; }
+    .preset-btn[aria-pressed="true"] { border-color: #8cc63f; background: var(--lime); color: var(--olive); }
+    .preset-btn[aria-pressed="mixed"] { border-color: #00a6ce; background: #e8f6fb; }
+    .preset-btn:disabled { opacity: .45; cursor: not-allowed; }
 
-      header {
-        margin-bottom: 20px;
-        padding: 24px 26px;
-        border-radius: 20px;
-        background: linear-gradient(135deg, var(--duo-navy), #005b7f);
-        box-shadow: 0 14px 34px rgba(0, 59, 92, 0.16);
-      }
+    /* Native details + checkboxes, not a simulated ARIA listbox. */
+    .source-details { position: relative; flex: 0 0 auto; }
+    .source-details > summary {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      list-style: none; min-width: 148px; padding: 8px 12px;
+      border: 1px solid var(--border); background: #ffffff; border-radius: 11px;
+      cursor: pointer; color: var(--ink); font-size: 12.5px; font-weight: 650;
+    }
+    .source-details > summary::-webkit-details-marker { display: none; }
+    .source-details[open] > summary { border-color: #00a6ce; background: var(--soft-green); }
+    .source-details[open] .chevron { transform: rotate(180deg); }
+    .chevron { font-size: 13px; transition: transform .15s ease; }
+    .source-popover {
+      position: absolute; top: calc(100% + 9px); right: 0; width: min(380px, calc(100vw - 38px));
+      background: white; border: 1px solid var(--border); border-radius: 14px;
+      box-shadow: 0 15px 38px rgba(0, 59, 92, .14); padding: 15px;
+      z-index: 20;
+    }
+    .source-popover-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 11px; }
+    .source-popover-head strong { font-size: 14px; }
+    .source-actions { display: flex; gap: 6px; }
+    .source-actions button { border: 0; background: var(--soft-green); color: var(--olive); border-radius: 8px; padding: 6px 8px; font-size: 11px; font-weight: 700; }
+    .source-actions button:hover { background: #d9f2f8; }
+    .source-options { max-height: 340px; overflow-y: auto; overscroll-behavior: contain; }
+    .source-group-heading { margin: 13px 2px 5px; color: var(--muted); text-transform: uppercase; font-size: 10px; font-weight: 800; letter-spacing: .085em; }
+    .source-group-heading:first-child { margin-top: 0; }
+    .source-item { display: flex; align-items: center; gap: 10px; padding: 6px 7px; border-radius: 7px; cursor: pointer; font-size: 13px; }
+    .source-item:hover { background: #e8f6fb; }
+    .source-item input { flex: 0 0 auto; width: 16px; height: 16px; accent-color: var(--olive); }
+    .source-item-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .source-item-count { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .source-help { margin: 12px 2px 0; font-size: 11px; color: var(--muted); }
 
-      header h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--duo-white);
-        letter-spacing: -0.5px;
-        margin-bottom: 0.5rem;
-      }
+    /* ------------------------------ Sections ----------------------------- */
+    .section-bar { margin: 16px 2px 13px; justify-content: space-between; gap: 15px; flex-wrap: wrap; }
+    .tab-row { gap: 7px; }
+    .tab-btn {
+      border: 0; background: transparent; color: var(--muted); border-radius: 10px;
+      padding: 9px 13px; font-weight: 750; font-size: 15px;
+    }
+    .tab-btn[aria-pressed="true"] { background: #e8f6fb; color: var(--olive); }
+    .tab-btn:hover { color: var(--olive); }
+    .tab-count { font-size: 12px; font-weight: 650; opacity: .8; margin-left: 2px; }
+    .section-actions { display: flex; align-items: center; gap: 13px; }
+    .result-count { font-size: 12px; color: var(--muted); }
+    .refresh-btn {
+      display: inline-flex; gap: 7px; align-items: center; border: 1px solid var(--border);
+      background: white; color: var(--olive); border-radius: 10px; padding: 8px 12px;
+      font-size: 12px; font-weight: 700;
+    }
+    .refresh-btn:hover { border-color: #00a6ce; background: #e8f6fb; }
+    .refresh-btn:disabled { opacity: .6; cursor: wait; }
+    .refresh-btn .icon svg { width: 15px; height: 15px; }
+    .notice { border-radius: 11px; padding: 12px 14px; margin-bottom: 12px; font-size: 13px; background: #e8f6fb; color: var(--olive); }
+    .notice.warning { color: var(--warning-ink); background: var(--warning-bg); }
+    .notice.error { color: var(--error-ink); background: var(--error-bg); }
 
-      header p {
-        font-size: 1.1rem;
-        color: #d9f2f8;
-      }
+    /* ----------------------------- Article cards ------------------------- */
+    .articles.view-magazine { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 17px; }
+    .article-card {
+      position: relative; min-width: 0; background: white; border: 1px solid #d6e4eb;
+      border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .article-card:hover { transform: translateY(-2px); box-shadow: 0 10px 27px rgba(0, 59, 92, .12); }
+    .card-link { display: flex; flex-direction: column; height: 100%; color: inherit; text-decoration: none; }
+    .card-link:focus-visible { outline: 3px solid #00a6ce; outline-offset: -4px; }
+    .card-media { position: relative; height: 158px; background: linear-gradient(135deg, #e8f6fb, #dceaf1); overflow: hidden; display: grid; place-items: center; }
+    .media-fallback { padding: 12px 20px; max-width: 80%; color: #5f7482; text-align: center; font-size: 20px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
+    .card-media img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+    .card-media.has-image .media-fallback { visibility: hidden; }
+    .card-body { display: flex; flex: 1; flex-direction: column; gap: 7px; padding: 16px 17px 18px; }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 5px 7px; color: var(--muted); font-size: 12px; }
+    .card-meta .source-name { color: #003b5c; font-weight: 750; }
+    .card-title { margin: 0; font-size: 17px; line-height: 1.31; letter-spacing: -.014em; font-weight: 750; color: var(--ink); overflow-wrap: anywhere; }
+    .card-link:hover .card-title { text-decoration: underline; text-decoration-color: #00a6ce; text-underline-offset: 3px; }
+    .card-description { margin: 0; color: #3f5665; font-size: 13px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+    .card-readmore { color: var(--olive); font-size: 12px; font-weight: 800; margin-top: auto; padding-top: 4px; }
+    .bookmark-btn {
+      position: absolute; top: 11px; right: 11px; z-index: 2; display: flex; align-items: center;
+      justify-content: center; gap: 5px; height: 36px; min-width: 36px; padding: 0 9px;
+      border: 1px solid rgba(0, 59, 92, .12); border-radius: 10px;
+      background: rgba(255, 255, 255, .96); color: var(--olive);
+      box-shadow: 0 2px 10px rgba(0, 59, 92, .10);
+      font-size: 12px; font-weight: 700;
+    }
+    .bookmark-btn:hover { background: var(--lime); }
+    .bookmark-btn[aria-pressed="true"] { background: var(--lime); }
+    .bookmark-btn[aria-pressed="true"] svg { fill: currentColor; }
+    .bookmark-btn .icon svg { width: 17px; height: 17px; }
+    .bookmark-label { display: none; }
 
-      .filters {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin: 15px 0;
-        align-items: center;
-      }
+    /* Compact mode: headline-oriented, no image downloads. */
+    .articles.view-compact { display: grid; grid-template-columns: 1fr; gap: 7px; }
+    .view-compact .article-card { min-height: 87px; box-shadow: none; }
+    .view-compact .article-card:hover { transform: none; border-color: #00a6ce; box-shadow: 0 3px 10px rgba(0, 59, 92, .06); }
+    .view-compact .card-link { padding-right: 60px; }
+    .view-compact .card-media, .view-compact .card-description, .view-compact .card-readmore { display: none; }
+    .view-compact .card-body { gap: 5px; padding: 14px 19px; }
+    .view-compact .card-title { font-size: 15px; line-height: 1.35; }
+    .view-compact .bookmark-btn { top: 50%; transform: translateY(-50%); }
 
-      .filters label {
-        font-size: 0.9rem;
-        color: var(--duo-navy);
-      }
+    .empty-state { background: white; border: 1px dashed #c6dfe9; border-radius: var(--radius); padding: 44px 20px; text-align: center; color: var(--muted); }
+    .empty-state h3 { color: var(--ink); margin: 0 0 5px; font-size: 18px; }
+    .empty-state p { margin: 0 auto 16px; max-width: 490px; font-size: 14px; }
+    .empty-state button { background: var(--lime); border: 0; border-radius: 10px; color: var(--olive); font-size: 13px; font-weight: 800; padding: 10px 14px; }
+    .empty-state button:hover { filter: brightness(.96); }
+    .footer { margin-top: 29px; color: #5f7482; font-size: 12px; text-align: center; }
+    .toast { position: fixed; z-index: 100; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--olive); color: #fff; padding: 10px 17px; border-radius: 11px; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,.16); max-width: min(94vw, 460px); text-align: center; }
 
-      .filters input[type="text"] {
-        padding: 8px 10px;
-        border-radius: 999px;
-        border: 1px solid var(--duo-navy);
-        min-width: 220px;
-        outline: none;
-      }
+    @media (max-width: 1060px) {
+      .articles.view-magazine { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 690px) {
+      .page { width: min(100% - 24px, 1280px); padding-top: 12px; }
+      .hero { padding: 18px; border-radius: 16px; min-height: 0; align-items: flex-start; flex-direction: column; gap: 10px; }
+      .hero::before { right: 30px; }
+      .hero-side { text-align: left; align-self: flex-start; }
+      .control-surface { padding: 13px; }
+      .control-top { align-items: stretch; flex-wrap: wrap; }
+      .search-box { flex-basis: 100%; max-width: none; }
+      .controls-right { width: 100%; justify-content: space-between; }
+      .filter-row { flex-wrap: wrap; }
+      .preset-wrap { flex-basis: 100%; }
+      .source-details { margin-left: auto; }
+      .section-bar { align-items: flex-start; }
+      .section-actions { width: 100%; justify-content: space-between; }
+      .articles.view-magazine { grid-template-columns: 1fr; }
+      .card-media { height: 170px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
 
-      .filters input[type="text"]:focus {
-        border-color: var(--duo-cyan);
-        box-shadow: 0 0 0 3px rgba(0, 166, 206, 0.18);
-      }
+    .filter-diagnostics { margin-top: 24px; padding: 15px 18px; border: 1px solid var(--border); border-radius: 13px; background: white; font-size: 12px; }
+    .filter-diagnostics summary { cursor: pointer; color: var(--olive); font-weight: 700; }
+    .filter-diagnostics h3 { margin: 18px 0 8px; font-size: 13px; }
+    .diag-table { border-collapse: collapse; width: 100%; margin-top: 14px; font-size: 11px; }
+    .diag-table td, .diag-table th { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); vertical-align: top; overflow-wrap: anywhere; }
+    .diag-table th { background: var(--soft-green); }
+    .diag-failed { color: var(--error-ink); }
+    .filter-diagnostics .source-help { margin-top: 12px; line-height: 1.5; }
+    @media(max-width: 700px) { .filter-diagnostics { overflow-x: auto; } .diag-table { min-width: 630px; } }
 
-      .multi-select {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-      }
 
-      .multi-label {
-        font-size: 0.9rem;
-        color: var(--duo-navy);
-      }
-
-      .multi-trigger {
-        display: inline-flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        min-width: 220px;
-        padding: 8px 12px;
-        border: 1px solid var(--duo-navy);
-        border-radius: 999px;
-        background: var(--duo-white);
-        color: var(--duo-navy);
-        cursor: pointer;
-      }
-
-      .multi-trigger:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 166, 206, 0.18);
-      }
-
-      .multi-trigger .chev {
-        font-size: 0.9rem;
-        opacity: 0.8;
-      }
-
-      .multi-panel {
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 0;
-        z-index: 50;
-        width: min(340px, 90vw);
-        max-height: 320px;
-        overflow: auto;
-        background: var(--duo-white);
-        border: 1px solid rgba(0, 59, 92, 0.22);
-        border-radius: 16px;
-        box-shadow: 0 16px 36px rgba(0, 59, 92, 0.14);
-        padding: 10px;
-      }
-
-      .multi-actions {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 10px;
-      }
-
-      .multi-actions .mini {
-        border: 1px solid var(--duo-cyan);
-        background: var(--duo-sky);
-        color: var(--duo-navy);
-        border-radius: 999px;
-        padding: 5px 10px;
-        font-size: 0.8rem;
-        cursor: pointer;
-      }
-
-      .multi-options {
+    /* ================================================================
+       One-line market news toolbar (original mobile layout retained)
+       Visual order: search | all sources | source dropdown | magazine/compact.
+       Desktop only; native mobile layout stays readable.
+       ================================================================ */
+    @media (min-width: 901px) {
+      .control-surface {
         display: grid;
-        gap: 6px;
-      }
-
-      .multi-option {
-        display: flex;
+        grid-template-columns: minmax(120px, 145px) auto auto minmax(0, 1fr);
         align-items: center;
-        gap: 10px;
-        padding: 6px 8px;
-        border-radius: 10px;
-      }
-
-      .multi-option:hover {
-        background: rgba(140, 198, 63, 0.18);
-      }
-
-      .multi-option input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        accent-color: var(--duo-navy);
-      }
-
-      .multi-option span {
-        font-size: 0.9rem;
-        color: var(--duo-navy);
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px;
-      }
-
-      @media (max-width: 900px) {
-        .grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-
-      @media (max-width: 600px) {
-        .grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .card {
-        background: var(--duo-white);
-        border: 1px solid rgba(0, 59, 92, 0.08);
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 8px 22px rgba(0, 59, 92, 0.08);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-        cursor: pointer;
-      }
-
-      .card:focus-visible {
-        outline: 3px solid var(--duo-cyan);
-        outline-offset: 2px;
-      }
-
-      .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 14px 32px rgba(0, 59, 92, 0.16);
-      }
-
-      .card-image {
-        width: 100%;
-        height: 160px;
-        background-size: cover;
-        background-position: center;
-        background-color: #dceaf1;
-      }
-
-      .card-content {
-        padding: 14px 16px 16px;
-      }
-
-      .card-title {
-        font-size: 1.2rem;
-        color: var(--duo-navy);
-        font-weight: 600;
-        line-height: 1.2;
-        margin-bottom: 6px;
-      }
-
-      .card-meta {
-        font-size: 0.8rem;
-        color: var(--duo-muted);
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-bottom: 6px;
-      }
-
-      .card-description {
-        font-size: 0.85rem;
-        color: #3f5665;
-        margin-bottom: 10px;
-      }
-
-      .card-bottom {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        margin-top: 10px;
-      }
-
-      .card-source-chip {
-        display: inline-flex;
-        align-items: center;
-        max-width: 70%;
-        padding: 4px 9px;
-        border: 1px solid rgba(0, 166, 206, 0.3);
-        border-radius: 999px;
-        background: var(--duo-sky);
-        color: var(--duo-navy);
-        font-size: 0.75rem;
-        font-weight: 400;
-        line-height: 1.2;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .card-readmore {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-right: 6px;
-        text-decoration: none;
-        color: var(--duo-navy);
-        white-space: nowrap;
-      }
-
-      .card-readmore:hover {
-        color: var(--duo-cyan);
-        text-decoration: underline;
-      }
-
-      .status {
-        margin: 10px 0 8px;
+        column-gap: 12px;
+        margin-top: 12px;
         padding: 10px 12px;
-        border-left: 4px solid var(--duo-cyan);
-        background: rgba(232, 246, 251, 0.75);
-        border-radius: 0 10px 10px 0;
-        font-size: 0.85rem;
-        color: var(--duo-navy);
       }
-
-      .status.error {
-        color: #b42318;
+      /* Let the existing controls occupy grid cells without changing JS. */
+      .control-top, .filter-row, .controls-right { display: contents; }
+      /* Explicit row placement prevents DOM order from making a second row. */
+      .search-box, .preset-wrap, .source-details, .view-switch { grid-row: 1; }
+      .search-box {
+        grid-column: 1;
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+        flex: none;
       }
-
-      @media (max-width: 600px) {
-        header h1 {
-          font-size: 1.5rem;
-        }
-
-        .card-image {
-          height: 140px;
-        }
+      .search-box input {
+        height: 36px;
+        border-radius: 9px;
+        padding: 0 29px 0 32px;
+        font-size: 12px;
       }
-    </style>
-  </head>
+      .search-box > .icon { left: 9px; }
+      .search-box > .icon svg { width: 15px; height: 15px; }
+      .clear-search { width: 28px; height: 28px; top: 4px; right: 3px; font-size: 20px; }
+      .preset-wrap {
+        grid-column: 2;
+        min-width: 0;
+        flex: none;
+        flex-wrap: nowrap;
+        gap: 4px;
+      }
+      .preset-btn {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        padding: 7px 8px;
+        font-size: 11px;
+        line-height: 1.3;
+      }
+      .source-details { grid-column: 3; margin: 0; min-width: 0; }
+      .source-details > summary {
+        min-width: 105px;
+        padding: 7px 9px;
+        border-radius: 9px;
+        font-size: 11px;
+        white-space: nowrap;
+      }
+      .view-switch { grid-column: 4; gap: 2px; padding: 2px; justify-self: end; }
+      .view-btn { padding: 7px 7px; font-size: 11px; gap: 4px; }
+      .view-btn .icon svg { width: 15px; height: 15px; }
+    }
+    @media (min-width: 901px) and (max-width: 1060px) {
+      .control-surface { grid-template-columns: minmax(100px, 117px) auto auto minmax(0, 1fr); gap: 5px; padding: 9px 10px; }
+      .preset-wrap { gap: 3px; }
+      .preset-btn { padding-inline: 6px; font-size: 10.5px; }
+      .source-details > summary { min-width: 95px; padding-inline: 7px; }
+      .view-btn { padding-inline: 5px; font-size: 10.5px; }
+    }
+    @media (max-width: 900px) {
+      /* Two rows only where a single row would compromise readability. */
+      .control-surface { margin-top: 12px; padding: 12px; }
+      .preset-wrap { gap: 5px; }
+      .preset-btn { padding: 7px 10px; }
+    }
 
-  <body>
-    <div class="page">
-      <header>
-        <h1>DUO Market Research Nieuws</h1>
-        <p>Berichten uit de HR-sector, automatisch verzameld.</p>
-      </header>
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">DUO-Onderwijs</div>
+        <h1>Market Research Nieuws</h1>
+      </div>
+      <div class="hero-side" aria-live="polite">
+        <span class="last-check" id="freshnessLabel">Nog niet bijgewerkt</span>
+        <span id="latestArticleLabel">De artikelen worden opgehaald.</span>
+      </div>
+    </header>
 
-      <div class="filters">
-        <label>
-          Zoeken:
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Filter op titel, tekst of bron…"
-          />
-        </label>
-
-        <div class="multi-select" id="sourceFilter">
-          <span class="multi-label">Bronnen:</span>
-
-          <button
-            type="button"
-            class="multi-trigger"
-            id="sourceTrigger"
-            aria-haspopup="listbox"
-            aria-expanded="false"
-          >
-            <span id="sourceTriggerText">Alle bronnen</span>
-            <span class="chev">▾</span>
-          </button>
-
-          <div
-            class="multi-panel"
-            id="sourcePanel"
-            role="listbox"
-            aria-multiselectable="true"
-            hidden
-          >
-            <div class="multi-actions">
-              <button type="button" class="mini" id="sourceSelectAll">Alles</button>
-              <button type="button" class="mini" id="sourceClear">Geen</button>
-            </div>
-
-            <div class="multi-options" id="sourceOptions"></div>
+    <section class="control-surface" aria-label="Zoeken en weergave instellen">
+      <div class="control-top">
+        <div class="search-box">
+          <label class="sr-only" for="searchInput">Zoek op titel, tekst, auteur of bron</label>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span>
+          <input id="searchInput" type="search" placeholder="Zoeken…" autocomplete="off">
+          <button class="clear-search" id="clearSearch" type="button" aria-label="Zoekopdracht wissen" hidden>×</button>
+        </div>
+        <div class="controls-right">
+          <div class="view-switch" role="group" aria-label="Weergave">
+            <button class="view-btn" data-view="magazine" aria-pressed="true" type="button">
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Magazine
+            </button>
+            <button class="view-btn" data-view="compact" aria-pressed="false" type="button">
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>Compact
+            </button>
           </div>
         </div>
       </div>
 
-      <div id="status" class="status">Artikelen worden geladen…</div>
-      <div id="grid" class="grid"></div>
-    </div>
+      <div class="filter-row" id="newsFilters">
+        <div class="preset-wrap" id="presetBar" role="group" aria-label="Bronnen">
+          <button class="preset-btn" id="allSourcesButton" aria-label="Alle bronnen" title="Alle bronnen" aria-pressed="true" type="button">Alle bronnen</button>
+        </div>
 
-    <script>
-      const FEED_URLS = [
-        "https://rss.app/feeds/v1.1/_xVAKTNvlHh3E4F0W.json",
-      ];
+        <details class="source-details" id="sourceDetails">
+          <summary id="sourcesSummary">
+            <span id="sourceSummaryText">Bronnen kiezen</span>
+            <span class="chevron" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="source-popover">
+            <div class="source-popover-head">
+              <strong>Specifieke bronnen</strong>
+              <div class="source-actions">
+                <button type="button" id="sourceAll">Alles tonen</button>
+                <button type="button" id="sourceNone">Geen selecteren</button>
+              </div>
+            </div>
+            <div id="sourceOptions" class="source-options" aria-label="Beschikbare nieuwsbronnen"></div>
+            <p class="source-help">Selecteer de uitgevers waarvan je artikelen wilt bekijken. Een 0 betekent dat de bron momenteel geen artikelen aanlevert.</p>
+          </div>
+        </details>
+      </div>
+    </section>
 
-      const MAX_PER_HOST = 12;
+    <section aria-label="Artikelen">
+      <div class="section-bar">
+        <nav class="tab-row" aria-label="Artikellijsten">
+          <button type="button" class="tab-btn" id="tabNews" aria-pressed="true">Nieuws</button>
+          <button type="button" class="tab-btn" id="tabSaved" aria-pressed="false">Bewaarde artikelen <span id="savedCount" class="tab-count">0</span></button>
+        </nav>
+        <div class="section-actions">
+          <span class="result-count" id="resultCount" aria-live="polite">Artikelen worden geladen…</span>
+          <button class="refresh-btn" type="button" id="refreshButton">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M5.8 9a7 7 0 0 1 12-2L20 12M4 12l2.2 3a7 7 0 0 0 12-1"/></svg></span>
+            <span id="refreshText">Vernieuwen</span>
+          </button>
+        </div>
+      </div>
 
-      const BLOCKED_HOSTS = new Set([
-        "nl.linkedin.com",
-        "linkedin.com",
-        "www.linkedin.com",
-        "facebook.com",
-        "www.facebook.com",
-        "m.facebook.com",
-        "l.facebook.com",
-        "fb.com",
-        "www.fb.com",
-      ]);
+      <div class="notice" id="feedNotice" role="status">Artikelen worden geladen…</div>
+      <div class="articles view-magazine" id="articles" aria-label="Nieuwsartikelen"></div>
+      <details id="filterDiagnostics" class="filter-diagnostics">
+        <summary id="diagnosticsSummary">Filtercontrole — wacht op de bronnen…</summary>
+        <div id="diagnosticsBody"></div>
+      </details>
+    </section>
+    <footer class="footer">Interne DUO-Onderwijs startpagina voor HR- en marktonderzoek. Artikelen openen bij de oorspronkelijke uitgever.</footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-      let allArticles = [];
-      let activeSources = new Set();
-      let searchQuery = "";
+  <script>
+    "use strict";
 
-      document.addEventListener("DOMContentLoaded", () => {
-        fetchFeed();
-        setupSearch();
+    /* ======================================================================
+       1. CONFIGURATION
+       ====================================================================== */
+    // Original RSS.app feed from the uploaded DUO Market Research Nieuws page.
+    // This combined feed contains articles from multiple HR publishers.
+    const FEEDS = [{
+      id: "market-research",
+      name: "DUO Market Research",
+      host: "market-research-feed",
+      group: "markt",
+      profile: "none",
+      endpoint: "https://rss.app/feeds/v1.1/_xVAKTNvlHh3E4F0W.json"
+    }];
+
+    const MAX_PER_HOST = 12;
+    const MAX_ARTICLE_AGE_DAYS = 90;
+    const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+    const FEED_TIMEOUT_MS = 10000;
+    const FETCH_CONCURRENCY = 8;
+    const PREFS_KEY = "duo-market-newsfeed-prefs-v1";
+    const BOOKMARKS_KEY = "duo-market-newsfeed-bookmarks-v1";
+
+    const GROUPS = [{ id: "markt", label: "HR & marktbronnen" }];
+    // Publisher names are preserved from the uploaded market-research feed.
+    const PUBLISHER_NAMES = {
+      "chro.nl": "CHRO",
+      "hrmorgen.nl": "HRMorgen",
+      "hrpraktijk.nl": "HR Praktijk",
+      "hrtecharena.nl": "HR Tech Arena",
+      "nvp-hrnetwerk.nl": "NVP",
+      "pwnet.nl": "PW.",
+      "tijdschriftvoorhrm.nl": "Tijdschrift voor HRM",
+      "trendsinhr.nl": "Trends in HR",
+      "werf-en.nl": "Werf&",
+      "rendement.nl": "HR Rendement"
+    };
+    const SOURCES = Object.fromEntries(
+      Object.entries(PUBLISHER_NAMES).map(([host, name]) => [host, {name, group: "markt"}])
+    );
+
+    const BLOCKED_DOMAINS = ["linkedin.com", "facebook.com", "fb.com"];
+    const $ = (id) => document.getElementById(id);
+    const collator = new Intl.Collator("nl-NL", { sensitivity: "base" });
+    const fullDateFormatter = new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+
+    /* ======================================================================
+       2. APPLICATION STATE & LOCAL STORAGE
+       ====================================================================== */
+    const state = {
+      articles: [],
+      byId: new Map(),
+      sourceStats: new Map(),
+      availableHosts: [],
+      selectionMode: "all",           // "all" or "custom". Empty custom = no sources.
+      selectedHosts: new Set(),       // domain IDs, not display labels
+      view: "magazine",              // magazine or compact
+      tab: "news",                   // news or saved; always start on news
+      search: "",                    // deliberately not saved between visits
+      bookmarks: new Map(),          // id -> saved snapshot, retained after RSS removal
+      loading: false,
+      checkedAt: null,               // successful browser retrieval, not RSS publication time
+      successfulFeeds: 0,
+      failedFeeds: 0,
+      loadError: false,
+      reports: [],
+      rejected: [],
+      sourceFailures: [],
+      totalIncoming: 0,
+      totalExcluded: 0,
+      totalDuplicates: 0
+    };
+
+    function readStorage(key) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : null;
+      } catch (error) {
+        console.warn("Unable to read localStorage:", error);
+        return null;
+      }
+    }
+
+    let storageWarningShown = false;
+    function writeStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+      } catch (error) {
+        console.warn("Unable to write localStorage:", error);
+        if (!storageWarningShown) {
+          storageWarningShown = true;
+          showToast("Deze browser kan voorkeuren niet bewaren. Controleer de browserinstellingen.");
+        }
+        return false;
+      }
+    }
+
+    function loadPreferences() {
+      const prefs = readStorage(PREFS_KEY);
+      if (!prefs || typeof prefs !== "object") return;
+      state.view = prefs.view === "compact" ? "compact" : "magazine";
+      state.selectionMode = prefs.selectionMode === "custom" ? "custom" : "all";
+      if (Array.isArray(prefs.selectedHosts)) {
+        state.selectedHosts = new Set(
+          prefs.selectedHosts
+            .filter((host) => typeof host === "string" && /^[a-z0-9.-]{1,200}$/.test(host))
+            .slice(0, 500)
+        );
+      }
+    }
+
+    function savePreferences() {
+      writeStorage(PREFS_KEY, {
+        view: state.view,
+        selectionMode: state.selectionMode,
+        selectedHosts: [...state.selectedHosts]
       });
+    }
 
-      async function fetchFeed() {
-        const statusEl = document.getElementById("status");
+    function loadBookmarks() {
+      const saved = readStorage(BOOKMARKS_KEY);
+      if (!Array.isArray(saved)) return;
+      for (const item of saved) {
+        if (!item || typeof item !== "object") continue;
+        const link = normalizedArticleUrl(item.link);
+        if (!link) continue;
+        const host = hostname(link);
+        if (isBlockedHost(host)) continue;
+        state.bookmarks.set(link, {
+          id: link,
+          link,
+          host,
+          title: typeof item.title === "string" ? item.title.slice(0, 500) : "Zonder titel",
+          description: typeof item.description === "string" ? item.description.slice(0, 900) : "",
+          author: typeof item.author === "string" ? item.author.slice(0, 200) : "",
+          source: sourceName(host),
+          image: safeHttpUrl(item.image),
+          publishedAt: validTimestamp(item.publishedAt),
+          savedAt: validTimestamp(item.savedAt) || Date.now()
+        });
+      }
+    }
 
+    function saveBookmarks() {
+      writeStorage(BOOKMARKS_KEY, [...state.bookmarks.values()]);
+    }
+
+    /* ======================================================================
+       3. DATA VALIDATION / FEED NORMALIZATION
+       ====================================================================== */
+    function safeHttpUrl(value) {
+      if (typeof value !== "string" || !value.trim()) return null;
+      try {
+        const url = new URL(value);
+        return url.protocol === "https:" || url.protocol === "http:" ? url.href : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function normalizedArticleUrl(value) {
+      const safe = safeHttpUrl(value);
+      if (!safe) return null;
+      const url = new URL(safe);
+      url.hash = "";
+      for (const key of [...url.searchParams.keys()]) {
+        if (/^utm_/i.test(key) || ["fbclid", "gclid", "mc_cid", "mc_eid"].includes(key.toLowerCase())) {
+          url.searchParams.delete(key);
+        }
+      }
+      if (url.pathname.length > 1) url.pathname = url.pathname.replace(/\/+$/, "");
+      return url.href;
+    }
+
+    function hostname(url) {
+      try { return new URL(url).hostname.toLowerCase().replace(/^www\./, ""); }
+      catch { return ""; }
+    }
+
+    function isBlockedHost(host) {
+      return BLOCKED_DOMAINS.some((domain) => host === domain || host.endsWith("." + domain));
+    }
+
+    function sourceName(host) { return SOURCES[host]?.name || host || "Onbekende bron"; }
+    function sourceGroup(host) { return SOURCES[host]?.group || "other"; }
+
+    function validTimestamp(value) {
+      if (typeof value === "number" && Number.isFinite(value) && value > 0 && value < 8640000000000000) return value;
+      if (typeof value === "string" && value.trim()) {
+        const ms = Date.parse(value);
+        return Number.isFinite(ms) ? ms : null;
+      }
+      return null;
+    }
+
+    // Exclude undated articles and articles older than a rolling 90-day window.
+    // Explicitly saved bookmarks are preserved in the reading list.
+    function articleDateIssue(publishedAt, now = Date.now()) {
+      if (!Number.isFinite(publishedAt) || publishedAt <= 0) {
+        return "Geen geldige publicatiedatum";
+      }
+      if (publishedAt < now - MAX_ARTICLE_AGE_DAYS * MILLISECONDS_PER_DAY) {
+        return "Ouder dan " + MAX_ARTICLE_AGE_DAYS + " dagen";
+      }
+      return null;
+    }
+
+    function textFromFeed(value) {
+      if (typeof value !== "string") return "";
+      // Parse HTML snippets in an inert document; never insert feed HTML into the UI.
+      const doc = new DOMParser().parseFromString(value, "text/html");
+      doc.querySelectorAll("script, style, noscript").forEach((node) => node.remove());
+      return (doc.body.textContent || "").replace(/\s+/g, " ").trim();
+    }
+
+    function imageFromFeed(item) {
+      const direct = safeHttpUrl(item.image) || safeHttpUrl(item.banner_image);
+      if (direct) return direct;
+      if (!Array.isArray(item.attachments)) return null;
+      for (const attachment of item.attachments) {
+        if (!attachment || typeof attachment !== "object") continue;
+        const url = safeHttpUrl(attachment.url);
+        if (!url) continue;
+        const mime = String(attachment.mime_type || "").toLowerCase();
+        if (mime.startsWith("image/") || (!mime && /\.(jpe?g|png|webp|gif|avif)(\?|$)/i.test(url))) return url;
+      }
+      return null;
+    }
+
+    function mapItemToArticle(item, feed) {
+      if (!item || typeof item !== "object") return null;
+      const link = normalizedArticleUrl(item.url || item.external_url || item.link);
+      if (!link) return null;
+      const articleHost = hostname(link);
+      if (!articleHost || isBlockedHost(articleHost)) return null;
+      const description = textFromFeed(item.content_text || item.description_text || item.summary || item.description_html || item.content_html || item.description || "");
+      const author = Array.isArray(item.authors) && typeof item.authors[0]?.name === "string" ? item.authors[0].name : (item.author || "");
+      return {
+        id: link, link,
+        host: articleHost, // Market feed aggregates different publishers; use each article's actual host.
+        articleHost,
+        feedId: feed.id,
+        feedName: feed.name,
+        title: textFromFeed(item.title || "Zonder titel") || "Zonder titel",
+        description,
+        author: String(author).slice(0, 200),
+        source: sourceName(articleHost),
+        image: safeHttpUrl(item.thumbnail) || imageFromFeed(item),
+        publishedAt: validTimestamp(item.date_published || item.pubDate || item.date_modified || item.published),
+        savedAt: null
+      };
+    }
+
+    function normalizeSearch(text) {
+      return String(text || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("nl-NL");
+    }
+
+    function matchesSearch(article, terms) {
+      if (!terms.length) return true;
+      const haystack = normalizeSearch([
+        article.title, article.description, article.author, article.source, article.host
+      ].join(" "));
+      return terms.every((term) => haystack.includes(term));
+    }
+
+    /* ======================================================================
+       4. MARKET FEED RETRIEVAL
+       ====================================================================== */
+    // The source page does not apply education-specific keyword rules.
+    // Publication-date filtering and URL validation still apply.
+    function applyEditorialRules() { return { accepted: true }; }
+
+    async function fetchSingleFeed(feed) {
+      const endpoints = [feed.endpoint, feed.fallbackEndpoint].filter(Boolean);
+      const errors = [];
+      for (const endpoint of endpoints) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), FEED_TIMEOUT_MS);
         try {
-          statusEl.textContent = "Artikelen worden geladen…";
+          const response = await fetch(endpoint, { signal: controller.signal, cache: "no-store" });
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          const body = await response.text();
+          const trimmed = body.trimStart();
+          if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+            const data = JSON.parse(body);
+            const items = Array.isArray(data.items) ? data.items : (Array.isArray(data?.data?.items) ? data.data.items : null);
+            if (!items) throw new Error("JSON zonder items-lijst");
+            return items;
+          }
+          if (trimmed.startsWith("<")) return parseXmlFeed(body);
+          throw new Error("Geen JSON of RSS/XML");
+        } catch (error) {
+          errors.push(endpoint + ": " + (error.name === "AbortError" ? "time-out" : error.message));
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+      throw new Error(errors.join(" | "));
+    }
 
-          const results = await Promise.allSettled(
-            FEED_URLS.map(async (url) => {
-              const response = await fetch(url);
+    function parseXmlFeed(xml) {
+      const doc = new DOMParser().parseFromString(xml, "application/xml");
+      if (doc.querySelector("parsererror")) throw new Error("Ongeldige RSS/XML");
+      const rootName = doc.documentElement?.localName;
+      if (!['rss','RDF','feed'].includes(rootName)) throw new Error("Dashboard HTML in plaats van RSS/XML");
+      const get = (node, tag) => [...node.children].find(c => c.localName === tag)?.textContent?.trim() || "";
+      return [...doc.querySelectorAll("item, entry")].map(item => {
+        const atomLink = [...item.children].find(c => c.localName === "link" && c.getAttribute("href"));
+        const enclosure = [...item.children].find(c => c.localName === "enclosure");
+        const media = [...item.children].find(c => c.localName === "content" && c.getAttribute("url"));
+        return {
+          title: get(item, "title"),
+          url: atomLink?.getAttribute("href") || get(item, "link"),
+          content_text: get(item, "description") || get(item, "summary") || get(item, "content"),
+          date_published: get(item, "pubDate") || get(item, "published") || get(item, "updated"),
+          image: media?.getAttribute("url") || enclosure?.getAttribute("url") || null
+        };
+      });
+    }
 
-              if (!response.ok) {
-                throw new Error(`HTTP ${response.status} voor ${url}`);
+    let renderProgressTimer = null;
+    function updateSourceResults(unique, finished, reports) {
+      state.articles = [...unique.values()].sort((a, b) => (b.publishedAt || 0) - (a.publishedAt || 0));
+      state.byId = new Map(state.articles.map(a => [a.id, a]));
+      state.sourceStats.clear();
+      for (const article of state.articles) state.sourceStats.set(article.host, (state.sourceStats.get(article.host) || 0) + 1);
+      state.availableHosts = [...new Set([...Object.keys(SOURCES), ...state.articles.map(article => article.host)])];
+      buildSourceOptions();
+      renderArticles();
+      if (state.loading) showNotice(`${finished} van ${FEEDS.length} bronnen gecontroleerd; ${state.articles.length} artikelen verwerkt…`, "info");
+      renderDiagnostics(reports);
+    }
+
+    async function fetchFeeds() {
+      if (state.loading) return;
+      state.loading = true;
+      state.loadError = false;
+      state.reports = [];
+      state.rejected = [];
+      state.sourceFailures = [];
+      state.totalIncoming = 0;
+      state.totalExcluded = 0;
+      state.totalDuplicates = 0;
+      state.successfulFeeds = 0;
+      state.failedFeeds = 0;
+      $("refreshButton").disabled = true;
+      $("refreshText").textContent = "Laden…";
+      if (!state.checkedAt) $("freshnessLabel").textContent = "Artikelen laden…";
+      showNotice("Artikelen worden opgehaald…", "info");
+
+      const unique = new Map();
+      const reports = Array(FEEDS.length).fill(null);
+      let next = 0, finished = 0;
+      const scheduleUpdate = () => {
+        if (renderProgressTimer !== null) return;
+        renderProgressTimer = setTimeout(() => {
+          renderProgressTimer = null;
+          updateSourceResults(unique, finished, reports);
+        }, 300);
+      };
+
+      async function worker() {
+        while (next < FEEDS.length) {
+          const index = next++;
+          const feed = FEEDS[index];
+          const report = { feed: feed.name, profile: feed.profile, raw: 0, accepted: 0, rejected: 0, duplicates: 0, status: "ok", error: "" };
+          try {
+            const items = await fetchSingleFeed(feed);
+            state.successfulFeeds++;
+            report.raw = items.length;
+            state.totalIncoming += items.length;
+            for (const rawItem of items) {
+              const article = mapItemToArticle(rawItem, feed);
+              if (!article) continue;
+
+              // Apply publication-date rules before keyword filtering and deduplication.
+              const dateIssue = articleDateIssue(article.publishedAt);
+              if (dateIssue) {
+                report.rejected++;
+                state.totalExcluded++;
+                if (state.rejected.length < 350) {
+                  state.rejected.push({
+                    feed: feed.name,
+                    title: article.title,
+                    link: article.link,
+                    reason: dateIssue,
+                    type: "date"
+                  });
+                }
+                continue;
               }
 
-              const data = await response.json();
-              return data.items || [];
-            })
-          );
-
-          const combinedItems = results
-            .filter((result) => result.status === "fulfilled")
-            .flatMap((result) => result.value);
-
-          allArticles = combinedItems.map(mapItemToArticle).filter(Boolean);
-
-          const seen = new Set();
-          allArticles = allArticles.filter((article) => {
-            if (!article.link || seen.has(article.link)) return false;
-            seen.add(article.link);
-            return true;
-          });
-
-          allArticles.sort(
-            (a, b) =>
-              new Date(b.pubDate || 0) - new Date(a.pubDate || 0)
-          );
-
-          buildSourceDropdown(allArticles);
-          renderArticles();
-
-          const failedCount = results.filter(
-            (result) => result.status === "rejected"
-          ).length;
-
-          statusEl.textContent =
-            `Geladen: ${allArticles.length} artikelen.` +
-            (failedCount ? ` (${failedCount} feed(s) mislukt)` : "");
-
-          statusEl.classList.remove("error");
-        } catch (error) {
-          console.error(error);
-          statusEl.textContent =
-            "Laden is mislukt. Zie de browserconsole voor details.";
-          statusEl.classList.add("error");
+              const evaluation = applyEditorialRules(article, feed);
+              if (!evaluation.accepted) {
+                report.rejected++;
+                state.totalExcluded++;
+                if (state.rejected.length < 350) state.rejected.push({ feed: feed.name, title: article.title, link: article.link, reason: evaluation.reason, type: evaluation.type });
+                continue;
+              }
+              if (unique.has(article.id)) {
+                report.duplicates++;
+                state.totalDuplicates++;
+                const prior = unique.get(article.id);
+                if (article.description.length > prior.description.length) prior.description = article.description;
+                if (!prior.image && article.image) prior.image = article.image;
+                continue;
+              }
+              unique.set(article.id, article);
+              report.accepted++;
+            }
+          } catch (error) {
+            report.status = "failed";
+            report.error = String(error.message || error);
+            state.failedFeeds++;
+            state.sourceFailures.push(feed.name);
+            console.warn("Bron mislukt:", feed.name, report.error);
+          }
+          reports[index] = report;
+          finished++;
+          scheduleUpdate();
         }
       }
 
-      function extractHostFromUrl(url) {
-        try {
-          return new URL(url).hostname.replace(/^www\./, "");
-        } catch {
-          return "";
-        }
-      }
-
-      function isBlockedUrl(url) {
-        return BLOCKED_HOSTS.has(extractHostFromUrl(url));
-      }
-
-      function hostToSourceLabel(host) {
-        const map = {
-          "chro.nl": "CHRO",
-          "hrmorgen.nl": "HRMorgen",
-          "hrpraktijk.nl": "HR Praktijk",
-          "hrtecharena.nl": "HR Tech Arena",
-          "nvp-hrnetwerk.nl": "NVP",
-          "pwnet.nl": "PW.",
-          "tijdschriftvoorhrm.nl": "Tijdschrift voor HRM",
-          "trendsinhr.nl": "Trends in HR",
-          "werf-en.nl": "Werf&",
-          "rendement.nl": "HR Rendement",
-        };
-
-        return map[host] || host;
-      }
-
-      function mapItemToArticle(item) {
-        const title = item.title || "Zonder titel";
-        const link = item.url || "#";
-
-        if (link !== "#" && isBlockedUrl(link)) return null;
-
-        const description = item.content_text || "";
-        const pubDate = item.date_published || "";
-
-        let author = "";
-        if (
-          Array.isArray(item.authors) &&
-          item.authors.length > 0 &&
-          item.authors[0].name
-        ) {
-          author = item.authors[0].name;
-        }
-
-        const host = extractHostFromUrl(link);
-
-        let image = "";
-        if (item.image) {
-          image = item.image;
-        } else if (
-          Array.isArray(item.attachments) &&
-          item.attachments.length > 0 &&
-          item.attachments[0].url
-        ) {
-          image = item.attachments[0].url;
-        }
-
-        const source = hostToSourceLabel(host) || author || "Onbekende bron";
-
-        return {
-          title,
-          link,
-          description,
-          pubDate,
-          author,
-          source,
-          image,
-          host,
-        };
-      }
-
-      function updateSourceTriggerText() {
-        const textEl = document.getElementById("sourceTriggerText");
-
-        if (activeSources.size === 0) {
-          textEl.textContent = "Alle bronnen";
-        } else if (activeSources.size === 1) {
-          textEl.textContent = [...activeSources][0];
+      try {
+        await Promise.all(Array.from({ length: Math.min(FETCH_CONCURRENCY, FEEDS.length) }, worker));
+        if (renderProgressTimer !== null) clearTimeout(renderProgressTimer);
+        renderProgressTimer = null;
+        updateSourceResults(unique, finished, reports);
+        state.reports = reports.filter(Boolean);
+        state.checkedAt = state.successfulFeeds ? Date.now() : state.checkedAt;
+        if (!state.successfulFeeds) {
+          state.loadError = true;
+          showNotice("Geen nieuwsbronnen bereikbaar. Controleer de verbinding en de directe JSON-feedlinks in de filtercontrole.", "error");
+        } else if (state.failedFeeds) {
+          showNotice(`${state.successfulFeeds} van ${FEEDS.length} bronnen geladen; ${state.failedFeeds} mislukt. Zie Filtercontrole onderaan.`, "warning");
         } else {
-          textEl.textContent =
-            `${activeSources.size} bronnen geselecteerd`;
+          hideNotice();
         }
+      } catch (error) {
+        state.loadError = true;
+        console.error(error);
+        showNotice("Fout bij het verwerken van de bronfeeds: " + error.message, "error");
+      } finally {
+        state.loading = false;
+        $("refreshButton").disabled = false;
+        $("refreshText").textContent = "Vernieuwen";
+        updateFreshness();
+        renderArticles();
+        renderDiagnostics(state.reports);
       }
+    }
 
-      function buildSourceDropdown(articles) {
-        const trigger = document.getElementById("sourceTrigger");
-        const panel = document.getElementById("sourcePanel");
-        const optionsEl = document.getElementById("sourceOptions");
-        const selectAllButton = document.getElementById("sourceSelectAll");
-        const clearButton = document.getElementById("sourceClear");
+    function renderDiagnostics(reports) {
+      const summary = $("diagnosticsSummary");
+      const body = $("diagnosticsBody");
+      const failures = reports.filter(r => r?.status === "failed").length;
+      summary.textContent = `Filtercontrole — ${state.totalIncoming} ontvangen · ${state.totalExcluded} gefilterd · ${state.totalDuplicates} dubbelen · ${failures} bronfouten`;
+      const table = makeElement("table", "diag-table");
+      const head = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      ["Bron", "Regels", "Ontvangen", "Doorgelaten", "Afgewezen", "Dubbel", "Status"].forEach(label => headerRow.appendChild(makeElement("th", "", label)));
+      head.appendChild(headerRow);
+      table.appendChild(head);
+      const tbody = document.createElement("tbody");
+      for (const report of reports.filter(Boolean)) {
+        const row = document.createElement("tr");
+        [report.feed, report.profile, report.raw, report.accepted, report.rejected, report.duplicates, report.status === "failed" ? "Fout: " + report.error.slice(0, 120) : "OK"].forEach(value => row.appendChild(makeElement("td", "", String(value))));
+        if (report.status === "failed") row.className = "diag-failed";
+        tbody.appendChild(row);
+      }
+      table.appendChild(tbody);
+      body.replaceChildren(table);
+    }
 
-        const allSources = [
-          ...new Set(
-            articles
-              .map((article) => article.source)
-              .filter(Boolean)
-          ),
-        ].sort((a, b) => a.localeCompare(b, "nl"));
+    // ----------------------------------------------------------------------
+    // Time and availability reporting
+    // ----------------------------------------------------------------------
+    function formatDate(ms) {
+      if (!ms) return "Datum onbekend";
+      const date = new Date(ms);
+      const now = new Date();
+      const dayNumber = (d) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000;
+      const days = dayNumber(now) - dayNumber(date);
+      if (days === 0) return "Vandaag";
+      if (days === 1) return "Gisteren";
+      return fullDateFormatter.format(date);
+    }
 
-        optionsEl.innerHTML = "";
+    function updateFreshness() {
+      if (!state.checkedAt) {
+        if (!state.loading) {
+          $("freshnessLabel").textContent = "Nog geen geslaagde controle";
+          $("latestArticleLabel").textContent = "Klik op Vernieuwen om opnieuw te proberen.";
+        }
+        return;
+      }
+      const checked = new Date(state.checkedAt);
+      const checkedDate = fullDateFormatter.format(checked);
+      const time = checked.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
+      $("freshnessLabel").textContent = `${state.loadError ? "Laatste geslaagde controle" : "Feeds gecontroleerd"}: ${checkedDate}, ${time}`;
+      const newest = state.articles.find((a) => a.publishedAt);
+      const latest = newest ? `Nieuwste artikel: ${formatDate(newest.publishedAt)}` : "Geen artikeldatums beschikbaar";
+      const feedHealth = state.loadError
+        ? "Laatste vernieuwpoging mislukt"
+        : `${state.successfulFeeds}/${FEEDS.length} bronnen bereikbaar`;
+      $("latestArticleLabel").textContent = `${latest} · ${feedHealth}`;
+    }
 
-        allSources.forEach((source) => {
-          const row = document.createElement("label");
-          row.className = "multi-option";
+    function showNotice(message, type = "info") {
+      const box = $("feedNotice");
+      box.textContent = message;
+      box.className = "notice" + (type === "info" ? "" : " " + type);
+      box.hidden = false;
+    }
+    function hideNotice() { $("feedNotice").hidden = true; }
 
+    let toastTimeout;
+    function showToast(message) {
+      const toast = $("toast");
+      toast.textContent = message;
+      toast.hidden = false;
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => { toast.hidden = true; }, 2900);
+    }
+
+    /* ======================================================================
+       5. SOURCE FILTERS & PRESETS
+       ====================================================================== */
+    function hostsInGroup(groupId) {
+      // Include configured sources even if they have no current articles.
+      // Otherwise saved group presets would silently exclude them on future visits.
+      return Object.keys(SOURCES).filter((host) => sourceGroup(host) === groupId);
+    }
+
+    function setSourceSelection(mode, hosts = state.selectedHosts) {
+      state.selectionMode = mode;
+      state.selectedHosts = new Set(hosts);
+      savePreferences();
+      syncSourceControls();
+      renderArticles();
+    }
+
+    function toggleGroup(groupId) {
+      const hosts = hostsInGroup(groupId);
+      if (!hosts.length) return;
+      if (state.selectionMode === "all") {
+        // First preset click replaces 'all' with precisely that group.
+        setSourceSelection("custom", hosts);
+        return;
+      }
+      const selected = new Set(state.selectedHosts);
+      const wholeGroupSelected = hosts.every((host) => selected.has(host));
+      hosts.forEach((host) => wholeGroupSelected ? selected.delete(host) : selected.add(host));
+      setSourceSelection("custom", selected);
+    }
+
+    function toggleHost(host, checked) {
+      const selected = state.selectionMode === "all"
+        ? new Set([...Object.keys(SOURCES), ...state.availableHosts])
+        : new Set(state.selectedHosts);
+      if (checked) selected.add(host);
+      else selected.delete(host);
+      setSourceSelection("custom", selected);
+    }
+
+    function buildSourceOptions() {
+      const root = $("sourceOptions");
+      const fragment = document.createDocumentFragment();
+      const sections = [...GROUPS, { id: "other", label: "Overige bronnen" }];
+      let found = false;
+
+      for (const group of sections) {
+        const hosts = (group.id === "other"
+          ? state.availableHosts.filter((host) => !SOURCES[host])
+          : hostsInGroup(group.id)
+        ).sort((a, b) => collator.compare(sourceName(a), sourceName(b)));
+        if (!hosts.length) continue;
+        found = true;
+        const heading = makeElement("div", "source-group-heading", group.label);
+        fragment.appendChild(heading);
+        for (const host of hosts) {
+          const label = makeElement("label", "source-item");
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
-          checkbox.value = source;
-          checkbox.checked = activeSources.has(source);
-
-          checkbox.addEventListener("change", () => {
-            if (checkbox.checked) {
-              activeSources.add(source);
-            } else {
-              activeSources.delete(source);
-            }
-
-            updateSourceTriggerText();
-            renderArticles();
-          });
-
-          const text = document.createElement("span");
-          text.textContent = source;
-
-          row.appendChild(checkbox);
-          row.appendChild(text);
-          optionsEl.appendChild(row);
-        });
-
-        function openPanel() {
-          panel.hidden = false;
-          trigger.setAttribute("aria-expanded", "true");
-        }
-
-        function closePanel() {
-          panel.hidden = true;
-          trigger.setAttribute("aria-expanded", "false");
-        }
-
-        trigger.addEventListener("click", (event) => {
-          event.stopPropagation();
-
-          if (panel.hidden) {
-            openPanel();
-          } else {
-            closePanel();
-          }
-        });
-
-        document.addEventListener("click", closePanel);
-        panel.addEventListener("click", (event) => event.stopPropagation());
-
-        selectAllButton.addEventListener("click", () => {
-          activeSources = new Set(allSources);
-
-          optionsEl
-            .querySelectorAll('input[type="checkbox"]')
-            .forEach((checkbox) => {
-              checkbox.checked = true;
-            });
-
-          updateSourceTriggerText();
-          renderArticles();
-        });
-
-        clearButton.addEventListener("click", () => {
-          activeSources.clear();
-
-          optionsEl
-            .querySelectorAll('input[type="checkbox"]')
-            .forEach((checkbox) => {
-              checkbox.checked = false;
-            });
-
-          updateSourceTriggerText();
-          renderArticles();
-        });
-
-        updateSourceTriggerText();
-      }
-
-      function setupSearch() {
-        const input = document.getElementById("searchInput");
-
-        input.addEventListener("input", (event) => {
-          searchQuery = event.target.value.trim().toLowerCase();
-          renderArticles();
-        });
-      }
-
-      function renderArticles() {
-        const grid = document.getElementById("grid");
-        grid.innerHTML = "";
-
-        const filtered = allArticles.filter((article) => {
-          if (
-            activeSources.size > 0 &&
-            !activeSources.has(article.source)
-          ) {
-            return false;
-          }
-
-          if (searchQuery) {
-            const searchableText = [
-              article.title,
-              article.description,
-              article.author,
-              article.source,
-            ]
-              .join(" ")
-              .toLowerCase();
-
-            if (!searchableText.includes(searchQuery)) {
-              return false;
-            }
-          }
-
-          return true;
-        });
-
-        const hostCounts = {};
-        const limited = [];
-
-        filtered.forEach((article) => {
-          const host = article.host || "unknown";
-          hostCounts[host] = hostCounts[host] || 0;
-
-          if (hostCounts[host] < MAX_PER_HOST) {
-            hostCounts[host] += 1;
-            limited.push(article);
-          }
-        });
-
-        limited.forEach((article) => {
-          grid.appendChild(createCard(article));
-        });
-
-        const statusEl = document.getElementById("status");
-
-        if (limited.length === 0 && allArticles.length > 0) {
-          statusEl.textContent =
-            "Geen artikelen voldoen aan de gekozen filters.";
-        } else if (allArticles.length > 0) {
-          statusEl.textContent =
-            `Weergegeven: ${limited.length} van ${allArticles.length} artikelen.`;
-          statusEl.classList.remove("error");
+          checkbox.value = host;
+          checkbox.dataset.host = host;
+          checkbox.checked = state.selectionMode === "all" || state.selectedHosts.has(host);
+          const name = makeElement("span", "source-item-name", sourceName(host));
+          const count = makeElement("span", "source-item-count", String(state.sourceStats.get(host) || 0));
+          label.append(checkbox, name, count);
+          fragment.appendChild(label);
         }
       }
+      if (!found) fragment.appendChild(makeElement("p", "source-help", "Nog geen bronnen beschikbaar."));
+      root.replaceChildren(fragment);
+      syncSourceControls();
+    }
 
-      function createCard(article) {
-        const card = document.createElement("article");
-        card.className = "card";
-        card.tabIndex = 0;
-        card.setAttribute("role", "link");
+    function syncSourceControls() {
+      const allMode = state.selectionMode === "all";
+      $("allSourcesButton").setAttribute("aria-pressed", String(allMode));
+      $("sourceSummaryText").textContent = allMode
+        ? "Bronnen"
+        : `Bronnen (${state.selectedHosts.size})`;
 
-        const openArticle = () => {
-          window.open(article.link, "_blank", "noopener,noreferrer");
-        };
+      $("sourceOptions").querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+        checkbox.checked = allMode || state.selectedHosts.has(checkbox.dataset.host);
+      });
+      document.querySelectorAll(".preset-btn[data-group]").forEach((button) => {
+        const hosts = hostsInGroup(button.dataset.group);
+        button.disabled = hosts.length === 0;
+        const availableCount = hosts.filter((host) => state.sourceStats.has(host)).length;
+        button.title = `${hosts.length} bronnen in deze groep; ${availableCount} met artikelen in de huidige feed`;
+        if (allMode || !hosts.length) {
+          button.setAttribute("aria-pressed", "false");
+        } else {
+          const numSelected = hosts.filter((host) => state.selectedHosts.has(host)).length;
+          button.setAttribute("aria-pressed", numSelected === 0 ? "false" : numSelected === hosts.length ? "true" : "mixed");
+        }
+      });
+    }
 
-        card.addEventListener("click", openArticle);
-        card.addEventListener("keydown", (event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            openArticle();
-          }
+    /* ======================================================================
+       6. BOOKMARKS, SEARCH & DISPLAY
+       ====================================================================== */
+    function toggleBookmark(id) {
+      if (state.bookmarks.has(id)) {
+        state.bookmarks.delete(id);
+        showToast("Artikel verwijderd uit Bewaarde artikelen.");
+      } else {
+        const article = state.byId.get(id);
+        if (!article) return;
+        state.bookmarks.set(id, {
+          ...article,
+          description: article.description.slice(0, 900),
+          savedAt: Date.now()
         });
+        showToast("Artikel bewaard.");
+      }
+      saveBookmarks();
+      renderArticles();
+    }
 
+    function setView(view) {
+      state.view = view === "compact" ? "compact" : "magazine";
+      document.querySelectorAll("[data-view]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.view === state.view));
+      });
+      savePreferences();
+      renderArticles();
+    }
+
+    function setTab(tab) {
+      state.tab = tab === "saved" ? "saved" : "news";
+      $("tabNews").setAttribute("aria-pressed", String(state.tab === "news"));
+      $("tabSaved").setAttribute("aria-pressed", String(state.tab === "saved"));
+      $("newsFilters").hidden = state.tab === "saved";
+      $("sourceDetails").open = false;
+      $("searchInput").placeholder = state.tab === "saved"
+        ? "Zoek bewaard…" : "Zoeken…";
+      renderArticles();
+    }
+
+const articleDayFormatter = new Intl.DateTimeFormat("nl-NL", {
+  timeZone: "Europe/Amsterdam",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit"
+});
+
+
+function mixPublishersWithinDay(articles) {
+  const days = new Map();
+
+  // Group articles by date and publisher.
+  for (const article of articles) {
+    const dayKey = article.publishedAt
+      ? articleDayFormatter.format(new Date(article.publishedAt))
+      : "zonder-datum";
+
+    if (!days.has(dayKey)) {
+      days.set(dayKey, new Map());
+    }
+
+    const publishers = days.get(dayKey);
+    const publisher = article.source || article.host || "Onbekend";
+
+    if (!publishers.has(publisher)) {
+      publishers.set(publisher, []);
+    }
+
+    publishers.get(publisher).push(article);
+  }
+
+  const mixed = [];
+
+  // Process each day separately, newest day first.
+  for (const publishers of days.values()) {
+    const groups = [...publishers.entries()].map(([publisher, queue]) => ({
+      publisher,
+      queue,
+      total: queue.length,
+      used: 0
+    }));
+
+    const totalForDay = groups.reduce(
+      (sum, group) => sum + group.total, 0
+    );
+
+    // Distribute each publisher proportionally across the day.
+    for (let slot = 0; slot < totalForDay; slot++) {
+      let bestGroup = null;
+      let bestScore = -Infinity;
+
+      for (const group of groups) {
+        if (group.used >= group.total) continue;
+
+        const score =
+          ((slot + 1) * group.total / totalForDay) - group.used;
+
+        const candidateDate =
+          group.queue[group.used].publishedAt || 0;
+
+        const bestDate =
+          bestGroup?.queue[bestGroup.used].publishedAt || 0;
+
+        if (
+          score > bestScore + 1e-9 ||
+          (
+            Math.abs(score - bestScore) <= 1e-9 &&
+            candidateDate > bestDate
+          )
+        ) {
+          bestGroup = group;
+          bestScore = score;
+        }
+      }
+
+      mixed.push(bestGroup.queue[bestGroup.used]);
+      bestGroup.used++;
+    }
+  }
+
+  return mixed;
+}
+    function filteredArticles() {
+      const terms = normalizeSearch(state.search).trim().split(/\s+/).filter(Boolean);
+      const input = state.tab === "saved"
+        ? [...state.bookmarks.values()].sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0))
+        : state.articles;
+      const matched = input.filter((article) => {
+        if (state.tab === "news" && state.selectionMode === "custom" && !state.selectedHosts.has(article.host)) return false;
+        return matchesSearch(article, terms);
+      });
+
+      // The per-host cap applies only to the newsfeed, never to the reading list.
+      if (state.tab === "saved") return { shown: matched, matching: matched.length, total: input.length };
+      const counts = new Map();
+      const shown = [];
+      for (const article of matched) {
+        const count = counts.get(article.host) || 0;
+        if (count >= MAX_PER_HOST) continue;
+        counts.set(article.host, count + 1);
+        shown.push(article);
+      }
+      return {shown: mixPublishersWithinDay(shown), matching: matched.length, total: input.length};
+    }
+
+    function makeElement(tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    }
+
+    function createCard(article) {
+      const card = makeElement("article", "article-card");
+      const link = makeElement("a", "card-link");
+      link.href = article.link; // normalized and restricted to http(s)
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.setAttribute("aria-label", `${article.title} – ${article.source} (opent in nieuw tabblad)`);
+
+      // No image is requested in compact mode; neutral source fallback otherwise.
+      if (state.view === "magazine") {
+        const media = makeElement("div", "card-media");
+        const fallback = makeElement("div", "media-fallback", article.source);
+        media.appendChild(fallback);
         if (article.image) {
-          const image = document.createElement("div");
-          image.className = "card-image";
-          image.style.backgroundImage = `url("${article.image}")`;
-          card.appendChild(image);
+          const img = document.createElement("img");
+          img.alt = ""; // Decorative: title and source are present as text.
+          img.loading = "lazy";
+          img.decoding = "async";
+          img.referrerPolicy = "no-referrer";
+          img.addEventListener("load", () => media.classList.add("has-image"));
+          img.addEventListener("error", () => { img.remove(); media.classList.remove("has-image"); });
+          img.src = article.image;
+          media.appendChild(img);
         }
-
-        const content = document.createElement("div");
-        content.className = "card-content";
-
-        const title = document.createElement("h2");
-        title.className = "card-title";
-        title.textContent = article.title;
-        content.appendChild(title);
-
-        const meta = document.createElement("div");
-        meta.className = "card-meta";
-
-        if (article.pubDate) {
-          const date = document.createElement("span");
-          date.textContent = new Date(article.pubDate).toLocaleDateString(
-            "nl-NL",
-            {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            }
-          );
-          meta.appendChild(date);
-        }
-
-        content.appendChild(meta);
-
-        if (article.description) {
-          const description = document.createElement("p");
-          description.className = "card-description";
-          description.textContent =
-            article.description.length > 220
-              ? `${article.description.slice(0, 220)}…`
-              : article.description;
-          content.appendChild(description);
-        }
-
-        const bottomRow = document.createElement("div");
-        bottomRow.className = "card-bottom";
-
-        if (article.source) {
-          const sourceChip = document.createElement("span");
-          sourceChip.className = "card-source-chip";
-          sourceChip.textContent = article.source;
-          sourceChip.title = article.source;
-          bottomRow.appendChild(sourceChip);
-        }
-
-        const readMore = document.createElement("a");
-        readMore.className = "card-readmore";
-        readMore.href = article.link;
-        readMore.target = "_blank";
-        readMore.rel = "noopener noreferrer";
-        readMore.textContent = "Lees meer →";
-        readMore.addEventListener("click", (event) =>
-          event.stopPropagation()
-        );
-
-        bottomRow.appendChild(readMore);
-        content.appendChild(bottomRow);
-        card.appendChild(content);
-
-        return card;
+        link.appendChild(media);
       }
-    </script>
 
-    <script
-      async
-      src="https://scripts.simpleanalyticscdn.com/latest.js"
-    ></script>
-  </body>
+      const body = makeElement("div", "card-body");
+      const meta = makeElement("div", "card-meta");
+      meta.appendChild(makeElement("span", "source-name", article.source));
+      meta.appendChild(makeElement("span", "", "·"));
+      const date = makeElement("time", "", formatDate(article.publishedAt));
+      if (article.publishedAt) {
+        date.dateTime = new Date(article.publishedAt).toISOString();
+        date.title = fullDateFormatter.format(new Date(article.publishedAt));
+      }
+      meta.appendChild(date);
+      const title = makeElement("h2", "card-title", article.title);
+      body.append(meta, title);
+      if (article.description) {
+        const shortDescription = article.description.length > 280
+          ? article.description.slice(0, 277).trimEnd() + "…" : article.description;
+        body.appendChild(makeElement("p", "card-description", shortDescription));
+      }
+      body.appendChild(makeElement("span", "card-readmore", "Lees artikel ↗"));
+      link.appendChild(body);
+      card.appendChild(link);
+
+      const saved = state.bookmarks.has(article.id);
+      const bookmark = makeElement("button", "bookmark-btn");
+      bookmark.type = "button";
+      bookmark.dataset.bookmarkId = article.id;
+      bookmark.setAttribute("aria-pressed", String(saved));
+      bookmark.setAttribute("aria-label", saved ? `Verwijder ${article.title} uit bewaarde artikelen` : `Bewaar ${article.title}`);
+      bookmark.title = saved ? "Verwijderen uit bewaarde artikelen" : "Artikel bewaren";
+      const icon = makeElement("span", "icon");
+      // Static, trusted SVG; article text itself is always inserted via textContent.
+      icon.setAttribute("aria-hidden", "true");
+      icon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4V4.5Z"/></svg>';
+      bookmark.append(icon, makeElement("span", "bookmark-label", saved ? "Bewaard" : "Bewaar"));
+      card.appendChild(bookmark);
+      return card;
+    }
+
+    function renderEmpty(result) {
+      const box = makeElement("div", "empty-state");
+      const heading = makeElement("h3", "");
+      const explanation = makeElement("p", "");
+      let action = null;
+
+      if (state.tab === "saved") {
+        if (!state.bookmarks.size) {
+          heading.textContent = "Nog geen bewaarde artikelen";
+          explanation.textContent = "Gebruik het bladwijzericoon bij een artikel om het hier te bewaren, ook als het later uit de RSS-feed verdwijnt.";
+          action = { label: "Bekijk nieuws", handler: () => setTab("news") };
+        } else {
+          heading.textContent = "Geen bewaarde artikelen gevonden";
+          explanation.textContent = "Pas je zoekopdracht aan om je bewaarde artikelen terug te vinden.";
+          action = { label: "Zoekopdracht wissen", handler: clearSearch };
+        }
+      } else if (state.loading && !state.checkedAt) {
+        heading.textContent = "Artikelen worden geladen";
+        explanation.textContent = "De nieuwsbronnen worden opgehaald.";
+      } else if (state.selectionMode === "custom" && state.selectedHosts.size === 0) {
+        heading.textContent = "Geen bronnen geselecteerd";
+        explanation.textContent = "Kies een bronnengroep of toon alle bronnen om artikelen te zien.";
+        action = { label: "Alle bronnen tonen", handler: () => setSourceSelection("all", []) };
+      } else if (!state.articles.length) {
+        heading.textContent = state.loadError ? "Nieuws kon niet worden geladen" : "Nog geen artikelen beschikbaar";
+        explanation.textContent = "Probeer de nieuwsbronnen te vernieuwen.";
+        action = { label: "Opnieuw proberen", handler: fetchFeeds };
+      } else {
+        heading.textContent = "Geen artikelen gevonden";
+        explanation.textContent = "Er zijn geen artikelen die passen bij je zoekopdracht en geselecteerde bronnen.";
+        action = { label: "Toon alle bronnen en wis zoeken", handler: () => { clearSearch(); setSourceSelection("all", []); } };
+      }
+
+      box.append(heading, explanation);
+      if (action) {
+        const button = makeElement("button", "", action.label);
+        button.type = "button";
+        button.addEventListener("click", action.handler);
+        box.appendChild(button);
+      }
+      return box;
+    }
+
+    function renderArticles() {
+      const root = $("articles");
+      const result = filteredArticles();
+      root.className = "articles view-" + state.view;
+      root.setAttribute("aria-label", state.tab === "saved" ? "Bewaarde artikelen" : "Nieuwsartikelen");
+      const fragment = document.createDocumentFragment();
+      if (result.shown.length) {
+        for (const article of result.shown) fragment.appendChild(createCard(article));
+      } else {
+        fragment.appendChild(renderEmpty(result));
+      }
+      root.replaceChildren(fragment);
+
+      $("savedCount").textContent = String(state.bookmarks.size);
+      if (state.tab === "saved") {
+        $("resultCount").textContent = `${result.shown.length} van ${result.total} bewaarde artikelen`;
+      } else if (state.loading && !state.checkedAt) {
+        $("resultCount").textContent = "Artikelen worden geladen…";
+      } else if (result.matching > result.shown.length) {
+        $("resultCount").textContent = `${result.shown.length} getoond · ${result.total} totaal`;
+      } else {
+        $("resultCount").textContent = `${result.shown.length} getoond van ${result.total} artikelen`;
+      }
+    }
+
+    function clearSearch() {
+      $("searchInput").value = "";
+      state.search = "";
+      $("clearSearch").hidden = true;
+      renderArticles();
+      $("searchInput").focus();
+    }
+
+    /* ======================================================================
+       7. EVENT WIRING / STARTUP
+       ====================================================================== */
+    function setupEvents() {
+      let searchTimer;
+      $("searchInput").addEventListener("input", (event) => {
+        state.search = event.target.value;
+        $("clearSearch").hidden = !state.search;
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(renderArticles, 110);
+      });
+      $("clearSearch").addEventListener("click", clearSearch);
+      $("refreshButton").addEventListener("click", fetchFeeds);
+      $("tabNews").addEventListener("click", () => setTab("news"));
+      $("tabSaved").addEventListener("click", () => setTab("saved"));
+
+      document.querySelectorAll("[data-view]").forEach((button) => {
+        button.addEventListener("click", () => setView(button.dataset.view));
+      });
+      $("allSourcesButton").addEventListener("click", () => setSourceSelection("all", []));
+      $("presetBar").addEventListener("click", (event) => {
+        const button = event.target.closest(".preset-btn[data-group]");
+        if (button && !button.disabled) toggleGroup(button.dataset.group);
+      });
+      $("sourceAll").addEventListener("click", () => setSourceSelection("all", []));
+      $("sourceNone").addEventListener("click", () => setSourceSelection("custom", []));
+      $("sourceOptions").addEventListener("change", (event) => {
+        const input = event.target.closest('input[type="checkbox"][data-host]');
+        if (input) toggleHost(input.dataset.host, input.checked);
+      });
+
+      // A <details> dropdown is keyboard-operable without custom listbox code.
+      document.addEventListener("pointerdown", (event) => {
+        const details = $("sourceDetails");
+        if (details.open && !details.contains(event.target)) details.open = false;
+      });
+      document.addEventListener("keydown", (event) => {
+        const details = $("sourceDetails");
+        if (event.key === "Escape" && details.open) {
+          details.open = false;
+          $("sourcesSummary").focus();
+        }
+      });
+      $("articles").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-bookmark-id]");
+        if (button) toggleBookmark(button.dataset.bookmarkId);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadPreferences();
+      loadBookmarks();
+      setupEvents();
+      document.querySelectorAll("[data-view]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.view === state.view));
+      });
+      syncSourceControls();
+      fetchFeeds();
+      renderArticles();
+    });
+  </script>
+  <!-- Existing traffic statistics integration, preserved from the original page. -->
+  <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
 </html>
